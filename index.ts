@@ -6,7 +6,7 @@ const ami = aws.ec2.getAmi({
         name: "name",
         values: ["amzn-ami-hvm-*"],
     }],
-    owners: [/*"538679150053"*/ /*"538679150053"*/ "137112412989" /* This owner ID is Amazon*/], 
+    owners: ["137112412989" /* This owner ID is Amazon*/], 
     mostRecent: true,
 });
 
@@ -19,19 +19,19 @@ const group = new aws.ec2.SecurityGroup("webserver-secgrp", {
 });
 
 
-const userData = // <-- ADD THIS DEFINITION
+const userData = 
 `#!/bin/bash
-pip3 install mlflow
 echo "Hello, World!" > index.html
 nohup python -m SimpleHTTPServer 80 &
-nohup python3 -m mlflow server &`;
-
+sudo yum -y install python-pip
+pip3 install mlflow
+nohup python -m mlflow server &`;
 
 const server = new aws.ec2.Instance("webserver-www", {
     instanceType: size,
     vpcSecurityGroupIds: [ group.id ], // reference the security group resource above
     ami: ami.then (res => {return res.id}),
-    userData: userData,             // <-- ADD THIS LINE
+    userData: userData,             
 });
 
 
